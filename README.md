@@ -41,6 +41,7 @@
 
 ## 🚀 快速开始
 
+## 方式一：GitHub Action运行
 ### 1. Fork 仓库
 
 点击右上角 **Fork** 按钮
@@ -67,6 +68,45 @@
 选择 **ClawCloud 自动登录保活** → **Run workflow**
 
 ---
+
+## 方式二：部署在自己VPS上面运行
+### 1. 把项目中VPS目录下的三个文件拷贝到你服务器上面，建议路径 **/opt/claw-auto**
+
+### 2. 修改run.sh文件内容，把相关参数值改为你自己的
+
+### 3. 安装运行需要的环境
+```
+sudo apt update
+sudo apt install -y python3 python3-pip python3-venv git
+
+```
+### 4. 创建Python虚拟机环境
+```
+python3 -m venv venv
+source venv/bin/activate
+
+```
+### 5. 安装Python依赖包
+该脚本引用了 requests, playwright, 和 pynacl（用于 SecretUpdater 部分）。
+
+```
+pip install --upgrade pip
+pip install playwright requests pynacl
+```
+### 6. 安装playwright 和相关依赖
+```
+playwright install chromium --with-deps
+```
+### 7. 单次执行，测试脚本
+- 确保你当前属于Python虚拟环境，判断方式，命令行用户名前面有个括号写着虚拟环境名，例如 **(venv) root@**
+- 如果不在虚拟环境，执行命令 source venv/bin/activate ，进入
+- 授权run.sh 脚本可执行权限 chmod +x run.sh
+- 运行，./run.sh 。观察日志和TG通知
+
+### 8. 定时执行，脚本scheduler.py 是定义每15-20天随机执行一次
+```
+nohup ./venv/bin/python scheduler.py > claw.log 2>&1 &
+```
 
 ## 📊 流程图
 ```
@@ -100,6 +140,10 @@
 ├── .github/
 │   └── workflows/
 │       └── auto_login.yml    # GitHub Actions 配置
+├── VPS/
+│   └── auto_login.py         # VPS上面自动登录脚本
+├   ├── scheduler.py          # 定时任务脚本
+├   └── run.sh                # 运行脚本
 ├── scripts/
 │   └── auto_login.py         # 自动登录脚本
 ├── 1.png                      # Mobile 验证截图
